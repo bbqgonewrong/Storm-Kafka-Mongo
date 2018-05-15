@@ -9,6 +9,7 @@ snow white and the seven dwarfs
 i am at two with nature
 """.strip().split('\n')
 
+
 class SentenceSpout(storm.Spout):
     # Not much to do here for such a basic spout
     def initialize(self, conf, context):
@@ -23,6 +24,7 @@ class SentenceSpout(storm.Spout):
         sentence = random.choice(SENTENCES)
         storm.logInfo("Emiting %s" % sentence)
         storm.emit([sentence])
+
 
 # Start the spout when it's invoked
 SentenceSpout().run()

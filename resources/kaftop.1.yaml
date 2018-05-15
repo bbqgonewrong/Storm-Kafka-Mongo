@@ -1,0 +1,92 @@
+
+name: "kafka-topology"
+
+components:
+  - id: "stringScheme"
+    className: "org.apache.storm.kafka.StringScheme"
+
+  - id: "stringMultiScheme"
+    className: "org.apache.storm.spout.SchemeAsMultiScheme"
+    constructorArgs:
+      - ref: "stringScheme"
+
+  - id: "zkHosts"
+    className: "org.apache.storm.kafka.ZkHosts"
+    constructorArgs:
+      - "172.25.33.193:2181"
+
+  - id: "spoutConfig"
+    className: "org.apache.storm.kafka.SpoutConfig"
+    constructorArgs:
+      # brokerHosts
+      - ref: "zkHosts"
+      # topic
+      - "twitter-stream"
+      # zkRoot
+      - ""
+      # id
+      - "myId"
+    properties:
+      - name: "scheme"
+        ref: "stringMultiScheme"
+
+
+config:
+  topology.workers: 1
+  # ...
+
+# spout definitions
+spouts:
+  - id: "kafka-spout"
+    className: "org.apache.storm.kafka.KafkaSpout"
+    constructorArgs:
+      - ref: "spoutConfig"
+
+# bolt definitions
+bolts:
+  - id: "processingbolt"
+    className: "org.apache.storm.flux.wrappers.bolts.FluxShellBolt"
+    constructorArgs:
+      # command line
+      - ["python", "custombolt.py"]
+      # output fields
+      - ["block"]
+    parallelism: 1
+    # ...
+
+  
+  # - id: "db-bolt"
+  #   className: "org.apache.storm.flux.wrappers.bolts.FluxShellBolt"
+  #   constructorArgs:
+  #     # command line
+  #     - ["python", "dbbolt.py"]
+  #     # output fields
+  #     - ["block"]
+  #   parallelism: 1
+  # ...
+
+  - id: "log"
+    className: "org.apache.storm.flux.wrappers.bolts.LogInfoBolt"
+    parallelism: 1
+    # ...
+
+#stream definitions
+# stream definitions define connections between spouts and bolts.
+# note that such connections can be cyclical
+# custom stream groupings are also supported
+
+streams:
+  - name: "kafka --> processbolt" # name isn't used (placeholder for logging, UI, etc.)
+    from: "kafka-spout"
+    to: "processingbolt"
+    grouping:
+      type: LOCAL_OR_SHUFFLE
+   
+
+  - name: "processbolt --> log"
+    from: "processingbolt"
+    to: "log"
+    grouping:
+      type: LOCAL_OR_SHUFFLE
+    
+

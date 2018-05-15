@@ -39,7 +39,7 @@ components:
   - id: "zkHosts"
     className: "org.apache.storm.kafka.ZkHosts"
     constructorArgs:
-      - "localhost:2181"
+      - "172.25.33.193:2181"
 
 # Alternative kafka config
 #  - id: "kafkaConfig"
@@ -58,7 +58,7 @@ components:
       # brokerHosts
       - ref: "zkHosts"
       # topic
-      - "test"
+      - "twitter-stream"
       # zkRoot
       - ""
       # id
