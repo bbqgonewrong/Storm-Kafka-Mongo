@@ -2,6 +2,14 @@
 name: "kafka-topology"
 
 components:
+# MongoDB mapper
+  - id: "mongodb-mapper"
+    className: "org.apache.storm.mongodb.common.mapper.SimpleMongoMapper"
+    configMethods:
+      - name: "withFields"
+        args: # The following are the tuple fields to map to a MongoDB document
+          - ["block"]
+
   - id: "stringScheme"
     className: "org.apache.storm.kafka.StringScheme"
 
@@ -53,17 +61,15 @@ bolts:
       - ["block"]
     parallelism: 1
     # ...
-
-  
-  # - id: "db-bolt"
-  #   className: "org.apache.storm.flux.wrappers.bolts.FluxShellBolt"
-  #   constructorArgs:
-  #     # command line
-  #     - ["python", "dbbolt.py"]
-  #     # output fields
-  #     - ["block"]
-  #   parallelism: 1
-  # ...
+    
+  - id: "mongodb-bolt"
+    className: "org.apache.storm.mongodb.bolt.MongoInsertBolt"
+    constructorArgs:
+      - "mongodb://localhost:27017/testdb"
+      - "block"
+      - ref: "mongodb-mapper"
+    parallelism: 1
+    # ...
 
   - id: "log"
     className: "org.apache.storm.flux.wrappers.bolts.LogInfoBolt"
@@ -82,10 +88,9 @@ streams:
     grouping:
       type: LOCAL_OR_SHUFFLE
    
-
-  - name: "processbolt --> log"
+  - name: "processbolt --> mongo"
     from: "processingbolt"
-    to: "log"
+    to: "mongodb-bolt"
     grouping:
       type: LOCAL_OR_SHUFFLE
     

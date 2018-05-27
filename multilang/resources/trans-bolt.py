@@ -1,6 +1,5 @@
 import storm
 import json
-import ast
 
 
 class SplitBolt(storm.BasicBolt):
@@ -10,23 +9,20 @@ class SplitBolt(storm.BasicBolt):
     def initialize(self, conf, context):
         self._conf = conf
         self._context = context
-        storm.logInfo("Custom-processing bolt instance starting...")
+        storm.logInfo("Transaction-processing bolt instance starting...")
 
     def process(self, tup):
-        # Split the inbound sentence at spaces
+        # Process block data here
 
-                # process touples here
         data = tup.values[0]
         data = json.loads(data)
+        data = json.loads(data)
+        blockData = data["result"]
 
-        data = data["text"]
-
-        # words = tup.values[0].split()
-        # # Loop over words and emit
-        # for word in words:
-        storm.logInfo("Emitting from Custom BOLT")
+        trsansaction = blockData["transactions"]
+        storm.logInfo("Emitting from Transaction BOLT")
         #     storm.emit([word])
-        storm.emit([data])
+        storm.emit([trsansaction])
 
 
 
