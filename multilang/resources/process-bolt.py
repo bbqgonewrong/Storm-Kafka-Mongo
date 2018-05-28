@@ -62,23 +62,26 @@ class SplitBolt(storm.BasicBolt):
                 blockData = data["result"]
 
                 # add decimal of hex number
-                # blockData["blockNumber"] = str(
-                #     convertHexToDec(blockData["number"]))
+                blockData["blockNumber"] = str(
+                    convertHexToDec(blockData["number"]))
 
-                # # adding decimal timestamp
-                # blockData["timestamp"] = str(
-                #     convertHexToDec(blockData["timestamp"]))
+                # adding decimal timestamp
+                blockData["timestamp"] = str(
+                    convertHexToDec(blockData["timestamp"]))
 
                 # add btc
 
-                # blockData["BTCValue"] = str(getTimeValue(
-                #     int(blockData["timestamp"]), "pricebtc", self.database))
-                # blockData["USDValue"] = str(getTimeValue(
-                #     int(blockData["timestamp"]), "priceusd", self.database))
-                # blockData["USDVolume"] = str(getTimeValue(
-                #     int(blockData["timestamp"]), "volumeusd", self.database))
-                # blockData["MarketCAP"] = str(getTimeValue(
-                #     int(blockData["timestamp"]), "cap", self.database))
+                blockData["BTCValue"] = str(getTimeValue(
+                    int(blockData["timestamp"]), "pricebtc", self.database))
+                blockData["USDValue"] = str(getTimeValue(
+                    int(blockData["timestamp"]), "priceusd", self.database))
+                blockData["USDVolume"] = str(getTimeValue(
+                    int(blockData["timestamp"]), "volumeusd", self.database))
+                blockData["MarketCAP"] = str(getTimeValue(
+                    int(blockData["timestamp"]), "cap", self.database))
+
+                # transactions are being handled in other botl
+                del blockData["transactions"]
 
                 storm.logInfo("Emitting from Block BOLT" + str(self.i))
                 #     storm.emit([word])
